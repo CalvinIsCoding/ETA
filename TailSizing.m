@@ -1,5 +1,34 @@
-clear, clc
-%% Horizontal Tail
+function [Sh,Ch_tip,Ch_root,bh,ih,ARh,lambdah,Lambdah,Gammah]= HorizontalTailSizing(M,D,Vc,Mac,AR,lambda,iw,S,alpha_twist,Lambda, Gamma, Claw)
+% Computes all necessary tail size parameters 
+%
+% USAGE:[Sh,Ch_tip,Ch_root,bh,ih,ARh,lambdah,Lambdah,Gammah]= 
+%       HorizontalTailSizing(M,D,Vc,Mac,AR,lambda,iw,S,alpha_twist,Lambda, Gamma, Claw)
+%
+% INPUT:
+% M             (1,1)              Mass at takeoff
+% D             (1,1)              Maximum fusealge diameter
+% Vc            (1,1)              Cruise Velocity
+% Mac           (1,1)              Mean aerodynamic chord
+% AR            (1,1)              Aspect Ratio
+% lambda        (1,1)              Taper Ratio
+% iw            (1,1)              Incidence angle of wing
+% S             (1,1)              Wing area
+% alpha_twist   (1,1)              Angle of twist of the wing
+% Lambda        (1,1)              
+% Gamma         (1,1)              Dihedral angle of the wing
+% Claw          (1,1)              Coeficient of lift slope vs alpha for
+%                                  the wing
+% OUTPUT: 
+% Sh            (1,1)              Platform area of horizontal tail
+% Ch_tip        (1,1)              Horizontal tail tip chord
+% Ch_root       (1,1)              Horizontal tail root chord
+% bh            (1,1)              Horizontal tail span
+% ih            (1,1)              Incidence angle of horizontal tail
+% ARh           (1,1)              Aspect Ratio of horizontal tail
+% lambdah       (1,1)              Horizontal tail taper ratio
+% Lambdah       (1,1)              Sweep angle of horizontal tail
+% Gammah        (1,1)              Dihedral angle of horizontal tail
+%% DEFINE CONSTANT VARIABLES
 Vh = 0.7; %horizontal tail Volume coefficient
 C = 1.077; %Wing MAC (m)
 S = 11.6; %Wing Area (m^2)
@@ -165,3 +194,4 @@ Fw = .5*1.225*(Vw^2)*Ss*.6;
 
 sideslip = atan(Vw/Vapr);
 %Cnb = .75*
+
