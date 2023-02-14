@@ -1,4 +1,4 @@
-function [CL1,y_s,CL_TO] = liftingLineTheory(N,S,AR,lambda,alpha_twist,i_w, CLalpha,alpha0,b,MAC,Croot,theta,alpha)
+function [CL1,y_s,CL_wing] = liftingLineTheory(N,S,AR,lambda,alpha_twist,i_w, CLalpha,alpha_0,b,MAC,Croot,theta,alpha, flaps)
 %% Lifting Line Theory Code
 % This code calculates the coefficient of lift over an entire wing using
 % the Prandtl thin airfoil theory.
@@ -20,8 +20,11 @@ function [CL1,y_s,CL_TO] = liftingLineTheory(N,S,AR,lambda,alpha_twist,i_w, CLal
 % Croot = (1.5*(1+lambda)*MAC)/(1+lambda+lambda^2); % root chord (m)
 % theta = pi/(2*N):pi/(2*N):pi/2;
 % alpha = i_w+alpha_twist:-alpha_twist/(N-1):i_w;
+% flaps: if neglecting flaps simply set this variable to "false". If using
+% flaps then set this value to "true"
 
 %% Neglecting Flaps
+if ~flaps
 clc
 clear
 
@@ -69,8 +72,10 @@ xlabel('Semi-span location (m)');
 ylabel ('Lift coefficient');
 CL_wing = pi * AR * A(1);
 
-%% With Flaps
+end
 
+%% With Flaps
+if flaps
 clc
 clear
 
@@ -139,5 +144,7 @@ subtitle('using NACA 64_4-421 airfoil');
 xlabel('Semi-span location (m)');
 ylabel ('Lift coefficient');
 
-CL_TO = pi * AR * A(1);
+CL_wing = pi * AR * A(1);
+end
+
 
