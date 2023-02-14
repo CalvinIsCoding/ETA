@@ -1,28 +1,31 @@
+function [CL1,y_s,CL_TO] = liftingLineTheory(N,S,AR,lambda,alpha_twist,i_w, CLalpha,alpha0,b,MAC,Croot,theta,alpha)
 %% Lifting Line Theory Code
 % This code calculates the coefficient of lift over an entire wing using
 % the Prandtl thin airfoil theory.
-
+%
 % Source: Aircraft Design: A Systems Engineering Approach 
 % Author: Mohammad H. Sadraey
 % Edited by: Michael Smith
+%
+% N = 9; % (number of segments - 1)
+% S = 11.6; % m^2
+% AR = 10; % Aspect ratio
+% lambda = 0.55; % Taper ratio
+% alpha_twist = -4; % Twist angle (deg)
+% i_w = 5; % wing setting angle (deg) (also called angle of incidence)
+% CLalpha = 5.4113; % lift-curve slope for NACA 644-421 (1/rad)
+% alpha_0 = -2.5; % zero-lift angle of attack (deg)
+% b = sqrt(AR*S); % wing span (m)
+% MAC = S/b; % Mean Aerodynamic Chord (m)
+% Croot = (1.5*(1+lambda)*MAC)/(1+lambda+lambda^2); % root chord (m)
+% theta = pi/(2*N):pi/(2*N):pi/2;
+% alpha = i_w+alpha_twist:-alpha_twist/(N-1):i_w;
+
 %% Neglecting Flaps
 clc
 clear
 
 
-N = 9; % (number of segments - 1)
-S = 11.6; % m^2
-AR = 10; % Aspect ratio
-lambda = 0.55; % Taper ratio
-alpha_twist = -4; % Twist angle (deg)
-i_w = 5; % wing setting angle (deg) (also called angle of incidence)
-CLalpha = 5.4113; % lift-curve slope for NACA 644-421 (1/rad)
-alpha_0 = -2.5; % zero-lift angle of attack (deg)
-b = sqrt(AR*S); % wing span (m)
-MAC = S/b; % Mean Aerodynamic Chord (m)
-Croot = (1.5*(1+lambda)*MAC)/(1+lambda+lambda^2); % root chord (m)
-theta = pi/(2*N):pi/(2*N):pi/2;
-alpha = i_w+alpha_twist:-alpha_twist/(N-1):i_w;
 
 
 % segment’s angle of attack
