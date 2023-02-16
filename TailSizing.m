@@ -1,24 +1,32 @@
-function [Sh,Ch_tip,Ch_root,bh,ih,ARh,lambdah,Lambdah,Gammah]= HorizontalTailSizing(M,D,Vc,Mac,AR,lambda,iw,S,alpha_twist,Lambda, Gamma, Claw)
-% Computes all necessary tail size parameters 
+function [Sh,Ch_tip,Ch_root,bh,ih,ARh,lambdah,Lambdah,Gammah,CLh,Cma,CLt]= HorizontalTailSizing(W,Df,Vcruise,Mac,AR,lambda,iw,S,Lambda, Gamma, CLaw,at, Vh,aoaW)
+% Computes all necessary tail size parameters, reference example 6.2 on pg
+% 331 in Mohammad H Sadraey's textbook
 %
 % USAGE:[Sh,Ch_tip,Ch_root,bh,ih,ARh,lambdah,Lambdah,Gammah]= 
 %       HorizontalTailSizing(M,D,Vc,Mac,AR,lambda,iw,S,alpha_twist,Lambda, Gamma, Claw)
 %
 % INPUT:
-% M             (1,1)              Mass at takeoff
-% D             (1,1)              Maximum fusealge diameter
-% Vc            (1,1)              Cruise Velocity
+%
+% W             (1,1)              Weight at takeoff
+% Df            (1,1)              Largest aft fusealge diameter
+% Vcruise       (1,1)              Cruise Velocity
 % Mac           (1,1)              Mean aerodynamic chord
-% AR            (1,1)              Aspect Ratio
+% AR            (1,1)              Aspect Ratio of Wing
 % lambda        (1,1)              Taper Ratio
 % iw            (1,1)              Incidence angle of wing
 % S             (1,1)              Wing area
-% alpha_twist   (1,1)              Angle of twist of the wing
-% Lambda        (1,1)              
+% Lambda        (1,1)              Sweep Angle
 % Gamma         (1,1)              Dihedral angle of the wing
-% Claw          (1,1)              Coeficient of lift slope vs alpha for
+% CLaw          (1,1)              Coeficient of lift slope vs alpha for
 %                                  the wing
+% at            (1,1)              Twist of the wing
+% Vh            (1,1)              Horizontal Tail Volume Coefficient:
+%                                  Choose from Table 6.4 (pg 303) in
+%                                  Mohommad H Sadraey)
+% aoaW          (1,1)              Angle of attack of the wing
+%
 % OUTPUT: 
+%
 % Sh            (1,1)              Platform area of horizontal tail
 % Ch_tip        (1,1)              Horizontal tail tip chord
 % Ch_root       (1,1)              Horizontal tail root chord
@@ -28,64 +36,63 @@ function [Sh,Ch_tip,Ch_root,bh,ih,ARh,lambdah,Lambdah,Gammah]= HorizontalTailSiz
 % lambdah       (1,1)              Horizontal tail taper ratio
 % Lambdah       (1,1)              Sweep angle of horizontal tail
 % Gammah        (1,1)              Dihedral angle of horizontal tail
+% CLh           (1,1)              Horizontal tail lift coeficcinet at
+%                                  cruise
+% Cma           (1,1)              Moment coefficent at cruise angle of
+%                                  attack for horizontal tail
+% CLt           (1,1)              Created lift coefficeint of the tail
+
 %% DEFINE CONSTANT VARIABLES
-Vh = 0.7; %horizontal tail Volume coefficient
-C = 1.077; %Wing MAC (m)
-S = 11.6; %Wing Area (m^2)
-Df = 1.524; %Largest Aft fuselage diameter (m)
-CLaw = 5.4113;
-W = 12946.1; %Weight
-Vcruise = 46.3; %m/s
-
-lopt = 1.4*sqrt(4*C*S*Vh/(Df*pi)); %Optimal tail arm in meters
-Sh = C*S*Vh/lopt; %taill area m^2
-
-CL = 2*W/(1.225*Vcruise^2*S); %Cruise Lift Coefficient
-AR = 10; %Wing AR
-Cmaf = -0.025; %Airfoil Sectional pitching moment coefficient From table 5.2 Sadraey
-Lamda = 4.5; %sweep angle
-at = -1e-6; %Twist of the wing
-Cmowf = Cmaf*((AR*cosd(Lamda)^2)/(AR+2*cosd(Lamda)))+0.01*at; %Pitching moment coefficient of the wings and uselage but not really the second one
-
-Lf = lopt/0.6;
-Xapex = -0.25*C+0.32*Lf+.144; %I don't know what this is
-Xcg = 0.25*C-0.114; %meters from leading edge
-h = Xcg/C; % %MAC
 h0 = .25;
-CLh = (Cmowf + CL*(h-h0))/Vh; %Cruise Tail lift coefficient
+ath = 0.000001; % twist angle of horizontal tail
 
-ARh = 5.59;
-taperh = .55; %initially same as wing
-Lamdah = 5; %Same as wing Sweep
-Gamma = 0.00001; %Same as wing Dihedral
+% Calcualte Tail Platform area
+lopt = 1.2*sqrt(4*Mac*S*Vh/(Df*pi)); % Eqn 6.47: Optimal tail arm to minimize aircraft drag [m]
+Sh = Mac*S*Vh/lopt; % Eqn 6.24: Tail platform area [m^2]
+
+CL = 2*W/(1.225*Vcruise^2*S); % Eqn 6.27: Cruise Lift Coefficient
+Cmaf = -0.025; % Airfoil Sectional pitching moment coefficient From table 5.2 Sadraey\
+
+Cmowf = Cmaf*((AR*cosd(Lambda)^2)/(AR+2*cosd(Lambda)))+0.01*at; % Eqn 6.26: Pitching moment coefficient wings/fuselage
+
+Lf = lopt/0.6; % Fuselage length [m] (reference Table 5.2 of Sadraey)
+
+Xcg = 0.25*Mac-0.114; % Location of center of mass from leading edge in terms of MAC [m]
+h = Xcg/Mac; % Percent of MAC
+
+CLh = (Cmowf + CL*(h-h0))/Vh; % Cruise Tail lift coefficient
+
+ARh = 2/3*AR; % Eqn 6.59: Initial horizontal tail aspect ratio
+lambdah = lambda; % initially same as wing 
+Lambdah = Lambda; % Same as wing Sweep angle [deg]
+Gammah=Gamma; % same as wing dihedral [deg]
 Clah = .1111111; %Find from book - double check this
 
-CLah = Clah/(1+Clah/(pi*ARh)); %tail lift curve slope
-%ah = CLh/CLah; %Tail aoa at cruise
-ah = -3.89;
+CLah = Clah/(1+Clah/(pi*ARh)); % Eqn 6.57: tail lift curve slope [1/rad]
+ah = CLh/CLah; % Eqn 6.51: Tail aoa at cruise [deg]
 
-%Last part
-N = 9;
-bh = sqrt(ARh*Sh);
-Ch = Sh/bh;
-Cr = (1.5*(1+taperh)*Ch)/(1+taperh+taperh^2);
+% To calculate the tail created lift coefficient, the lifting line theory 
+% is employed. The following calculates the tail lift coefficient with an 
+% angle of attack of ah deg.
+
+N = 9; % number of segments
+bh = sqrt(ARh*Sh); % tail span [m^2]
+MACh = Sh/bh; % mean aerodynamic chord
+Ch_root = (1.5*(1+lambdah)*MACh)/(1+lambdah+lambdah^2); % root chord
 theta = pi/(2*N):pi/(2*N):pi/2;
-ath = 0.000001;
-alpha = ah+ath:-ath/(N-1):ah;
+alpha = ah+ath:-ath/(N-1):ah; % segmnets angle of attack
 
-z = (bh/2)*cos(theta);
-c = Cr*(1-(1-Lamdah)*cos(theta));
+c = Ch_root*(1-(1-lambdah)*cos(theta)); % mean aerodynmaic chord at each segment
 mu = c*CLah/(4*bh);
-LHS = mu.*(alpha/57.3);
+LHS = mu.*(alpha/57.3); % left hand side
 
+% Solving N equations to find coefficients A(i)
 for i=1:N
     for j=1:N
-        B(i,j)= sin((2*j-1)*theta(i)*(1+(mu(i)*(2*j-1))/sin(theta(i))));
+        B(i,j)= sin((2*j-1)*theta(i))*(1+(mu(i)*(2*j-1))/sin(theta(i)));
     end
 end
-
 A = B\transpose(LHS);
-
 for i=1:N
     sum1(i) = 0;
     sum2(i) = 0;
@@ -94,104 +101,17 @@ for i=1:N
         sum2(i) = sum2(i)+A(j)*sin((2*j-1)*theta(i));
     end
 end
-CLt = pi*AR*A(1);
+CLt = pi*AR*A(1); % created lift coefficeint of the tail
 
-epi0 = 2*CL/(pi*AR);
-depida = 2*CLaw/(pi*AR);
-aw = 2; %Check for cruise aoa
-epi = epi0+depida*aw;
-ih = ah-1+epi;
+epi0 = 2*CL/(pi*AR); % Eqn 6.55 for downwash
+depida = 2*CLaw/(pi*AR); % Eqn 6.56
+epi = epi0+depida*aoaW; % Eqn 6.54
+ih = ah-1+epi; % Eqn 6.53: Incidence angle/tail setting angle for horizontal tail
 
-Cma = CLaw*(h-.25)-CLah*.98*Sh/S*(lopt/C-h)*(1-depida);
+% calculate the rest of the horisontal tail paramenters
+MACh=2/3*Ch_root; % Eqn 6.65: mean aerodynamic chord of horizontal tail
+ARh=bh/MACh; % Eqn: 6.63: Aspect ratio of horizontal tail
+Cma = CLaw*(h-.25)-CLah*.98*Sh/S*(lopt/C-h)*(1-depida); % Eqn 6.67
+Ch_tip=gammah*Ch_root; % Eqn 6.64: Chord at the tip of the horizontal tail
 
-%% Vertical Tail
-
-Vv = 0.04;
-b = 10.7703;
-Sv = b*S*Vv/lopt;
-ARv = 1.84;
-taperv = .55;
-iv = 0;
-lamdaV = 18;
-
-bv = sqrt(Sv*ARv);
-Cv = bv/ARv;
-Cvr = (3/2)*Cv*((1+taperv)/(1+taperv+taperv^2));
-Cvt = taperv*Cvr;
-
-%% Elevator Sizing
-
-%Rotation time during take off: 1-3 seconds
-%Take-off pitch angular acceleration: 8-10 deg/s/s
-
-be = .9*bh; %Elevator span (m)
-deltapmax = 20; %max positive deflection (down)
-deltanmax = -25; %Max nedative deflection (up)
-
-Vstall = 28.2944; %Stall speed in m/s - 55 knots
-Vr = 30.8666; %Rotation Speed 60 knots
-angR = 9; %Take off pitch angular acceleration (deg/s^2)
-
-qr = .5*1.225*Vr^2;
-CLTO = 1.1589; %Coefficient of lift for take off TODO get exact value
-Lwf = qr*CLTO*S; %Take off Lift
-Lhto = qr*Sh*CLh; %Take off tail lift
-Lto = Lwf+Lhto;
-
-CDTO = .05; %Coefficient of Drag at take off TODO Get number
-Dto = qr*CDTO*S;
-
-Cmacwf = -0.04; %Coefficient of moment about ac for the wings number
-Macwf = qr*Cmacwf*S*C;
-
-T = 125/Vr; %Thrust at take off get this number
-m = W/9.81; %Mass
-a = (T-Dto)/m; %Linear Acceleration at take off
-
-Xmg = 3.149; %Distance of main landing gear from nose cone (m)
-Xcgn = 2.8;
-Mw = W*(Xmg-Xcgn); %Weight moment
-
-Zd = .889; %Drag Height I guess
-Zmg = 0; %just the wheels
-Zcg = .889; %Center of gravity height
-Md = Dto*(Zd-Zmg); %Drag moment
-
-Zt = 1.016; %thrust height
-Mt = T*(Zt-Zmg); %Thrust moment
-
-Xacwf = .889; %wing ac
-Mlwf = Lwf*(Xmg-Xacwf); %Wing lift moment
-
-Ma = m*a*(Zcg-Zmg); %Acceleration moment
-
-Xach = lopt;
-Iyy = (1/12*282.91*C^2+(3/5*23.308*(.25*(Df/2)^2+1.69^2)...
-+23.308*Xmg^2)+(3/5*89.533*(.25*(Df/2)^2+4.386^2)+...
-89.533*(Lf-Xmg)^2)+1/12*60.516*(3*(Df/2)^2+2.163^2))+m;
-Lh = (Mlwf+Macwf+Ma+Mw+Md+Mt+Iyy*angR)/(Xach-Xmg);
-
-CLhto = 2*Lh/(qr*Sh);
-
-%te = ((ah/57.3)+(CLhto/CLah))/(deltanmax/57.3);
-te = .644;
-Ce = Ch/2;
-
-%% Rudder Sizing
-
-Vapr = 1.1*Vstall; %Approach landing velocity
-Vw = 8.746; %Max Cross wind m/s - 17 kn
-Vtot= sqrt(Vapr^2+Vw^2);
-
-Sf = Lf*Df; %Side fuselage area
-Ss = 1.02*(Sf+Sv); %Side surface area
-
-Xca = (Sf*Lf/2+Sv*(Lf-Cv/2))/(Sf+Sv);
-
-dc = Xca-Xcgn;
-
-Fw = .5*1.225*(Vw^2)*Ss*.6;
-
-sideslip = atan(Vw/Vapr);
-%Cnb = .75*
 
