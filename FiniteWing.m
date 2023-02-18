@@ -12,10 +12,10 @@ function [CLWF, CDindW] = FiniteWing(AR, Lambda, rho, twist, V, WLoad)
 %
 %       AR   (1,1)    Wing aspect ratio (dimensionless) 
 %   Lambda   (1,1)    Taper ratio of the wing (dimensionless)
-%      rho   (1,1)    Atmospheric density at altitude (kg/m^3)
+%      rho   (1,1)    Atmospheric density at altitude (lbs/ft^3)
 %    twist   (1,1)    Geometric twist of the wing (in degrees)
-%        V   (1,1)    Aircraft velocity (km/hr)
-%    Wload   (1,1)    Wing loading (N/m^2)
+%        V   (1,1)    Aircraft velocity (ft/s)
+%    Wload   (1,1)    Wing loading (lbs/ft^2)
 %
 % OUTPUTS:
 %  
@@ -28,8 +28,8 @@ function [CLWF, CDindW] = FiniteWing(AR, Lambda, rho, twist, V, WLoad)
 % Lambda=0.55;
 % rho=1.226;
 % twist=-4; % degrees
-% V=277.8; % km/hr
-% WLoad=1197.01; % N/m^2
+% V=277.8; % ft/s
+% WLoad=1197.01; % lbs/ft^2
 
 % Set up initial conditions to begin calculations (# of stations, etc.)
 k = 8;          % Number of spanwise stations to be used along wing
