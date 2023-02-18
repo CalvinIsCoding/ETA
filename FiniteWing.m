@@ -1,18 +1,42 @@
-% Comppute aerodynamic proprteries of a trapezoidal wing with a geometric
-% twist
+function [CLWF, CDindW] = FiniteWing(AR, Lambda, rho, twist, V, WLoad)
+%
+% USAGE: The purpose of this function file is to compute the various
+%        aerodynamic properties of a trapezoidal wing planform with a
+%        geometric twist. 
+%        
+%        All equations referred to in this code come from
+%        "Aircraft Design: A Systems Engineering Approach" by Mohammad H.
+%        Sadraey, 2013.
+%
+% INPUTS:
+%
+%       AR   (1,1)    Wing aspect ratio (dimensionless) 
+%   Lambda   (1,1)    Taper ratio of the wing (dimensionless)
+%      rho   (1,1)    Atmospheric density at altitude (kg/m^3)
+%    twist   (1,1)    Geometric twist of the wing (in degrees)
+%        V   (1,1)    Aircraft velocity (km/hr)
+%    Wload   (1,1)    Wing loading (N/m^2)
+%
+% OUTPUTS:
+%  
+%     CLWF   (1,1)    Total lift for the finite wing (dimensionless)
+%   CDindW   (1,1)    Total induced drag coefficient (dimensionless)
 
-% describe wing specifications
-AR=6;
-Lambda=0.55; 
-rho=1.226;
-twist=-4; % degrees
-V=250; % km/hr
-WLoad=800;
-A=zeros(1,8);
 
-% define initial conditions
-k=8; % spanwise station
+% First describe wing specifications
+% AR=10;
+% Lambda=0.55;
+% rho=1.226;
+% twist=-4; % degrees
+% V=277.8; % km/hr
+% WLoad=1197.01; % N/m^2
 
+% Set up initial conditions to begin calculations (# of stations, etc.)
+k = 8;          % Number of spanwise stations to be used along wing
+A=zeros(1,k);   % Array of stations (initialize as zeros())
+
+
+% Define initial conditions
 for j=1:k % j=1 is wing tip
     theta(j)=pi*j/(2*k); 
     costh(j)=cos(theta(j));
@@ -32,17 +56,18 @@ for j=1:k
 end
 
 % Choose two values of Al1 and Al2 for absolute angle of attack at the root
-% Calculate the absolute angle of attach at all wing stations, solve Eqns
+% Calculate the absolute angle of attack at all wing stations, solve Eqns
 % (6.40a) using cramers rule and then compute lift coefficient and
 % sectional lift coefficients using Eqn (6.33) and (6.41a)
 
-AL1=3; % degrees
-AL2=6; % degrees
+AL1=3; % Absolute angle of attack at the root (degrees)
+AL2=6; % Absolute angle of attack at the root (degrees)
 
-% Calculations for AL1
+% Calculations for AL1=3 degrees 
 for j=1:k
     Alabs(j)=(AL1+twist*costh(j))*pi/180;
 end
+
 A=Cramer(D,Alabs,A,k);
 CLW1=pi^2*A(1)/(1+Lambda);
 for j=1:k
@@ -53,11 +78,12 @@ for j=1:k
     end
 end
 
-% Calculations for AL2
+% Calculations for AL2=6 degrees
 A=zeros(1,8);
 for j=1:k
     Alabs(j)=(AL2+twist*costh(j))*pi/180;
 end
+
 A=Cramer(D,Alabs,A,k);
 CLW2=pi^2*A(1)/(1+Lambda);
 for j=1:k
@@ -74,23 +100,26 @@ for j=1:k
     CLB(j)=CL1(j)-CLA(j)*CLW1;
 end
 
-% compute the Wing Loading
+% Compute the Coefficient of Lift
 CLWF=WLoad/(0.5*rho*(V*1000/3600)^2);
 
-% assuming a linear relation between clw and the absolute angle of attack
+% Assuming a linear relation between clw and the absolute angle of attack
 % at the root, that angles under flights condition is 
 ALF=AL1+(AL2-AL1)*(CLWF-CLW1)/(CLW2-CLW1);
 
-% calcualte section lift coeff using either Eqn (6.46) or (6.41a)
+% Calculate sectional lift coefficient using either Eqn (6.46) or (6.41a)
+
 % with Eqn (6.46)
 for j=1:k
     CL_1(j)=CLB(j)+CLA(j)*CLWF;
 end
+
 % with Eqn (6.41a)
 A=zeros(1,8);
 for j=1:k
     Alabs(j)=(ALF+twist*costh(j))*pi/180;
 end
+
 A=Cramer(D,Alabs,A,k);
 for j=1:k
     sum=0;
@@ -101,7 +130,7 @@ for j=1:k
 end
 % We now compute sectional induced angles of attack using eq. (6..42a)
 % sectional induced drag coefficients using eq (6.51), and sectional lift
-% curve slope using eqs (6.48) and then proint results.
+% curve slope using eqs (6.48).
 for j=1:k
     sum=0;
     for N=1:k
@@ -113,9 +142,10 @@ for j=1:k
         Alind(j)=Alind(j)*180/pi;
     end
 end
-% compute induced drag coefficient, CDindW, weighted mean slope, mbar, and
-% the additional absolute angle of attack, AlabsSW, of the wing using
-% Eqn(6.35a), (6.53a), and (6.54) respectively and print results
+
+% Compute induced drag coefficient (CDindW), weighted mean slope (Mbar), and
+% the additional absolute angle of attack (AlabsSW), of the wing using
+% Eqn(6.35a), (6.53a), and (6.54), respectively.
 sum=0;
 for N=1:k
     sum=sum+(2*N-1)*A(N)^2;
@@ -127,4 +157,6 @@ for j=1:KM1
     sum=sum+(M(j)*C(j)+M(j+1)*C(j+1))*(Y(j)-Y(j+1));
     Mbar=sum/(1+Lambda);
     AlabsSW=CLWF/Mbar*180/pi;
+end
+
 end
