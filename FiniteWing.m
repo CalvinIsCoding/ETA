@@ -23,14 +23,6 @@ function [CLWF, CDindW] = FiniteWing(AR, Lambda, rho, twist, V, WLoad)
 %   CDindW   (1,1)    Total induced drag coefficient (dimensionless)
 
 
-% First describe wing specifications
-% AR=10;
-% Lambda=0.55;
-% rho=1.226;
-% twist=-4; % degrees
-% V=277.8; % ft/s
-% WLoad=1197.01; % lbs/ft^2
-
 % Set up initial conditions to begin calculations (# of stations, etc.)
 k = 8;          % Number of spanwise stations to be used along wing
 A=zeros(1,k);   % Array of stations (initialize as zeros())
