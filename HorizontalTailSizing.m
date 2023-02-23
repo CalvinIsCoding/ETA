@@ -47,17 +47,17 @@ h0 = .25;
 ath = 0.000001; % twist angle of horizontal tail
 
 % Calcualte Tail Platform area
-lopt = 1.2*sqrt(4*Mac*S*Vh/(Df*pi)); % Eqn 6.47: Optimal tail arm to minimize aircraft drag [m]
-Sh = Mac*S*Vh/lopt; % Eqn 6.24: Tail platform area [m^2]
+lopt = 1.2*sqrt(4*Mac*S*Vh/(Df*pi)); % Eqn 6.47: Optimal tail arm to minimize aircraft drag [ft]
+Sh = Mac*S*Vh/lopt; % Eqn 6.24: Tail platform area [ft^2]
 
 CL = 2*W/(1.225*Vcruise^2*S); % Eqn 6.27: Cruise Lift Coefficient
-Cmaf = -0.025; % Airfoil Sectional pitching moment coefficient From table 5.2 Sadraey\
+Cmaf = -0.025; % Airfoil Sectional pitching moment coefficient From table 5.2 Sadraey
 
 Cmowf = Cmaf*((AR*cosd(Lambda)^2)/(AR+2*cosd(Lambda)))+0.01*at; % Eqn 6.26: Pitching moment coefficient wings/fuselage
 
-Lf = lopt/0.6; % Fuselage length [m] (reference Table 5.2 of Sadraey)
+Lf = lopt/0.6; % Fuselage length [ft] (reference Table 5.2 of Sadraey)
 
-Xcg = 0.25*Mac-0.114; % Location of center of mass from leading edge in terms of MAC [m]
+Xcg = 0.25*Mac-0.114; % Location of center of mass from leading edge in terms of MAC [ft]
 h = Xcg/Mac; % Percent of MAC
 
 CLh = (Cmowf + CL*(h-h0))/Vh; % Cruise Tail lift coefficient
@@ -76,7 +76,7 @@ ah = CLh/CLah; % Eqn 6.51: Tail aoa at cruise [deg]
 % angle of attack of ah deg.
 
 N = 9; % number of segments
-bh = sqrt(ARh*Sh); % tail span [m^2]
+bh = sqrt(ARh*Sh); % tail span [ft^2]
 MACh = Sh/bh; % mean aerodynamic chord
 Ch_root = (1.5*(1+lambdah)*MACh)/(1+lambdah+lambdah^2); % root chord
 theta = pi/(2*N):pi/(2*N):pi/2;
