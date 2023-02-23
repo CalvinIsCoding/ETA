@@ -2,8 +2,8 @@
 % 
 %   Course: AEM 4333 - Senior Design
 %   Term: Spring 2023
-%   Revision #: 1 
-%   Last Modified: February 18, 2023
+%   Revision #: 3 
+%   Last Modified: February 23, 2023
 % 
 %   Group Name: Ecological Training Aircraft (ETA) 
 %   Members: Michael Smith, Erne Habegger-McCabe, Ben Schley, Calvin
@@ -27,7 +27,8 @@ Sweep = 0; % Sweep angle of wing (deg)
 Gamma = 5.5; % Dihedral angle of wing (deg) 
 Vh = 0.7; % Horizontal Tail Volume Coefficient:
           % Choose from Table 6.4 (pg 303)
-aoaW = 2;
+aoaW = 2; % angle of attack of the wing
+q = 0.5*Rho*V^2; % Dynamic pressure of the wing ()
 
 N = 9; % (number of wing segments - 1)
 S = 11.6 * (10.7639); % ft^2
@@ -71,6 +72,9 @@ M11=38.5+61; % [lb] Weight of Tail
 
 W = Outputs(3);
 
+% Optimized wing parameters
+[best] = optimizeWingDistribustion(W, q, S, AR, Lambda, i_w)
+
 % Wing Design 
 [CLWF, CDindW] = FiniteWing(AR, Lambda, Rho, twist, V, WLoad);
 
@@ -80,7 +84,7 @@ W = Outputs(3);
 
 % % Vertical Tail Design
 % [Sh,Ch_tip,Ch_root,bh,ih,ARh,lambdah,Lambdah,Gammah,CLh,Cma,CLt]= ...
-%     HorizontalTailSizing(W,Df,V,MAC,AR,Lambda,iw,S,Sweep,Gamma,CLalpha,twist,Vh,aoaW);
+%     VerticalTailSizing(W,Df,V,MAC,AR,Lambda,iw,S,Sweep,Gamma,CLalpha,twist,Vh,aoaW);
 
 % Flap Sizing (Lifting Line Theory)
 [CL1,y_s,CL_wing] = liftingLineTheory...
