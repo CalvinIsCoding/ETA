@@ -22,6 +22,7 @@ Rho = 1.226 * (0.062428); % Atmospheric density at altitude (lbs/ft^3)
 twist = -4; % Geometric twist of the wing (in degrees)
 V = 277.8 * (0.911344); % Aircraft velocity (ft/s)
 WLoad = 1197.01 * (0.020885472); % Wing loading (lbs/ft^2)
+Df = 50 /(12); % Largest aft fuselage diameter (ft)
 
 N = 9; % (number of wing segments - 1)
 S = 11.6 * (10.7639); % ft^2
@@ -58,20 +59,20 @@ M11=38.5+61; % [lb] Weight of Tail
 %*************************************************************************%
 
 % Call applicable functions to calculate geometric parameters
-% Wing Design 
-[CLWF, CDindW] = FiniteWing(AR, Lambda, Rho, twist, V, WLoad)
-
-% Tail Design %% NEED MORE INFO!!!
-% Don't know some of these variables
-
-% [Sh,Ch_tip,Ch_root,bh,ih,ARh,lambdah,Lambdah,Gammah,CLh,Cma,CLt]= ...
-%     HorizontalTailSizing(W,Df,Vcruise,Mac,AR,lambda,iw,S,Lambda, Gamma,CLaw,at,Vh,aoaW)
 
 % Center of Mass
 [Outputs] = Center_of_Mass...
-    (M_b, V_b, rho, V_s, M_s, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11)
+    (M_b, V_b, rho, V_s, M_s, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11);
+
+W = Outputs(3);
+
+% Wing Design 
+[CLWF, CDindW] = FiniteWing(AR, Lambda, Rho, twist, V, WLoad);
+
+% Tail Design
+[Sh,Ch_tip,Ch_root,bh,ih,ARh,lambdah,Lambdah,Gammah,CLh,Cma,CLt]= ...
+    HorizontalTailSizing(W,Df,Vcruise,MAC,AR,lambda,iw,S,Lambda,Gamma,CLaw,at,Vh,aoaW);
 
 % Flap Sizing (Lifting Line Theory)
 [CL1,y_s,CL_wing] = liftingLineTheory...
-    (N,S,AR,Lambda,twist,i_w,CLalpha,alpha_0,b,MAC,Croot,theta,alpha,flaps)
-
+    (N,S,AR,Lambda,twist,i_w,CLalpha,alpha_0,b,MAC,Croot,theta,alpha,flaps);
