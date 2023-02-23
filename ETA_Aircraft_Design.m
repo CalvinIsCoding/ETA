@@ -23,6 +23,11 @@ twist = -4; % Geometric twist of the wing (in degrees)
 V = 277.8 * (0.911344); % Aircraft velocity (ft/s)
 WLoad = 1197.01 * (0.020885472); % Wing loading (lbs/ft^2)
 Df = 50 /(12); % Largest aft fuselage diameter (ft)
+Sweep = 0; % Sweep angle of wing (deg)
+Gamma = 5.5; % Dihedral angle of wing (deg) 
+Vh = 0.7; % Horizontal Tail Volume Coefficient:
+          % Choose from Table 6.4 (pg 303)
+aoaW = 2;
 
 N = 9; % (number of wing segments - 1)
 S = 11.6 * (10.7639); % ft^2
@@ -69,9 +74,13 @@ W = Outputs(3);
 % Wing Design 
 [CLWF, CDindW] = FiniteWing(AR, Lambda, Rho, twist, V, WLoad);
 
-% Tail Design
+% Horizontal Tail Design
 [Sh,Ch_tip,Ch_root,bh,ih,ARh,lambdah,Lambdah,Gammah,CLh,Cma,CLt]= ...
-    HorizontalTailSizing(W,Df,Vcruise,MAC,AR,lambda,iw,S,Lambda,Gamma,CLaw,at,Vh,aoaW);
+    HorizontalTailSizing(W,Df,V,MAC,AR,Lambda,i_w,S,Sweep,Gamma,CLalpha,twist,Vh,aoaW);
+
+% % Vertical Tail Design
+% [Sh,Ch_tip,Ch_root,bh,ih,ARh,lambdah,Lambdah,Gammah,CLh,Cma,CLt]= ...
+%     HorizontalTailSizing(W,Df,V,MAC,AR,Lambda,iw,S,Sweep,Gamma,CLalpha,twist,Vh,aoaW);
 
 % Flap Sizing (Lifting Line Theory)
 [CL1,y_s,CL_wing] = liftingLineTheory...
