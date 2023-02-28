@@ -2,8 +2,8 @@
 % 
 %   Course: AEM 4333 - Senior Design
 %   Term: Spring 2023
-%   Revision #: 3 
-%   Last Modified: February 23, 2023
+%   Revision #: 4 
+%   Last Modified: February 28, 2023
 % 
 %   Group Name: Ecological Training Aircraft (ETA) 
 %   Members: Michael Smith, Erne Habegger-McCabe, Ben Schley, Calvin
@@ -42,6 +42,13 @@ theta = pi/(2*N):pi/(2*N):pi/2;
 alpha = i_w+twist:-twist/(N-1):i_w;
 flaps = 'false'; % no flaps
 
+% Vertical Tail Sizing parameters
+Vv = 0.04;
+ARv = 1.84;
+taperv = .55;
+iv = 0;
+lamdaV = 18;
+
 % Mass of hygrogen tanks
 M_b=52.895; % [lb] Mass of large hydrogen tank
 V_b=9.239; % [ft^3]Volume of large hydrogen tank (NOTE: taken from sheets,
@@ -71,9 +78,21 @@ M11=38.5+61; % [lb] Weight of Tail
     (M_b, V_b, rho, V_s, M_s, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11);
 
 W = Outputs(3);
+AR = linspace(0,15,10);
+Lambda = linspace(0,0.99,10);
+S = linspace(0,500,10);
+i_w = linspace(-5,10,10);
 
-% Optimized wing parameters
-[best] = optimizeWingDistribustion(W, q, S, AR, Lambda, i_w)
+% % Optimized wing parameters
+% [best] = optimizeWingDistribustion(W, q, S, AR, Lambda, i_w)
+% 
+% % best = [S AR i_w lamda twist CL_wing]
+% W = best(1);
+% q = best(2);
+% S = best(3);
+% AR = best(4);
+% Lambda = best(5);
+% i_w = best(6);
 
 % Wing Design 
 [CLWF, CDindW] = FiniteWing(AR, Lambda, Rho, twist, V, WLoad);
@@ -82,9 +101,8 @@ W = Outputs(3);
 [Sh,Ch_tip,Ch_root,bh,ih,ARh,lambdah,Lambdah,Gammah,CLh,Cma,CLt]= ...
     HorizontalTailSizing(W,Df,V,MAC,AR,Lambda,i_w,S,Sweep,Gamma,CLalpha,twist,Vh,aoaW);
 
-% % Vertical Tail Design
-% [Sh,Ch_tip,Ch_root,bh,ih,ARh,lambdah,Lambdah,Gammah,CLh,Cma,CLt]= ...
-%     VerticalTailSizing(W,Df,V,MAC,AR,Lambda,iw,S,Sweep,Gamma,CLalpha,twist,Vh,aoaW);
+% Vertical Tail Design
+[Sv,bv,Cv,Cvr,Cvt] = VerticalTailSizing(Vv,b,ARv,taperv,iv,lambdaV,MAC,Df,S);
 
 % Flap Sizing (Lifting Line Theory)
 [CL1,y_s,CL_wing] = liftingLineTheory...
