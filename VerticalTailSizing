@@ -1,15 +1,28 @@
-clear, clc
-%% Vertical Tail
+[Sv,bv,Cv,Cvr,Cvt] = function VerticalTailSizing(Vv,b,ARv,taperv,iv,lambdaV,Mac,Df,S)
+%
+%   INPUTS:
+%       Vv          
+%       b
+%       ARv
+%       taperv 
+%       iv
+%       lambdav
+%
+%
+%   OUTPUTS
+%       bv
+%       Cv
+%       Cvr
+%       Cvt
+%       Sv
+%
 
-Vv = 0.04;
-b = 10.7703; 
+
+lopt = 1.2*sqrt(4*Mac*S*Vv/(Df*pi)); % Eqn 6.47: Optimal tail arm to minimize aircraft drag [ft]
 Sv = b*S*Vv/lopt;
-ARv = 1.84;
-taperv = .55;
-iv = 0;
-lamdaV = 18;
-
 bv = sqrt(Sv*ARv);
 Cv = bv/ARv;
 Cvr = (3/2)*Cv*((1+taperv)/(1+taperv+taperv^2));
 Cvt = taperv*Cvr;
+
+end
